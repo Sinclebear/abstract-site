@@ -38,15 +38,20 @@ class Board {
         }
         this.name = boardName;
         this.articles = [];
+        this.id = getRandomInt(50001,99999); // Site id부여
         this.siteId = 0;
     }
     publish(article){
         if (this.siteId === 0){ // 특정 사이트에 소속되지 않은 게시판인 경우 (1~10000 숫자 부여. 0은 최초값)
             throw new Error("생성되지 않은 게시판입니다.");
+        } else if (article.subject === '' || article.subject === null || article.content === '' || article.content === null || article.author === '' || article.author === null) {
+            throw new Error("빈 칸 없이 모두 입력해주세요.");
         }
         let articleIdFormat = this.name + '-' + getRandomInt(100001,200000).toString(); // '공지사항-100001~199999 형태로 articleId 부여
         const currentDate = new Date().toISOString();
+
         article.id = articleIdFormat; // article 입력 시 id 부여
+        article.boardId = this.id.toString();
         article.createdDate = currentDate;
         this.articles.push(article);
     }
@@ -56,18 +61,38 @@ class Board {
 }
 
 class Article {
-    constructor(subject, content, author) {
-        if(subject === '' || subject === null || content === '' || content === null || author === '' || author === null) {
+    constructor(article) {
+        if(article.subject === '' || article.subject === null || article.content === '' || article.content === null || article.author === '' || article.author === null) {
             throw new Error('빈 칸없이 모두 입력해주세요.');
+            // throw error('에러');
         }
-        this.subject = subject;
-        this.content = content;
-        this.author = author;
-       
-   }
+        this.article = article;
+        // this.subject = article.subject;
+        // this.content = article.content;
+        // this.author = article.author;
+        this.boardId = 0;
+        this.comments = [];      
+    }
+    reply(comment){
+        if(this.boardId === 0){
+            throw new Error("생성되지 않은 게시판입니다.");
+        }
+        const currentDate = new Date().toISOString();
+        comment.createdDate = currentDate;
+        this.comments.push(comment);
+    }
+    getAllComments(){
+        return this.comments;
+    }
 }
 
-class Comment {}
+class Comment {
+    constructor(comment){
+        if(comment.content === '' || comment.content === null || comment.author === '' || comment.author === null){
+            throw new Error("코멘트에 필요한 내용을 모두 입력해주세요.");
+        }
+    }
+}
 
 module.exports = {
     Site,
